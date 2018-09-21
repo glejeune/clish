@@ -1,0 +1,13 @@
+${PLUGIN_NAME} version ${PLUGIN_VERSION} by ${PLUGIN_AUTHORS} 
+${PLUGIN_DESCRIPTION}.
+
+This plugin allow you to create a new CLI :
+
+  ${CLI_MAIN_COMMAND} new <name> [options]
+
+Options: 
+  --force   -f                       : Force CLI creation even if the destination directory exists
+  --path    -p <path>                : Destination directory
+  --repo    -r <repository url>      : Main repository URL
+  --version -v <version>             : CLI version
+  --import  -i <plugin> [plugin ...] : Import given plugins
