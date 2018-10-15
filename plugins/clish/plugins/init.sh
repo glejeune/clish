@@ -9,28 +9,30 @@ list_plugins() {
   PLUGINS_INDEX=0
   MAX_SIZE=0
   for PLUGIN in $CLI_PLUGINS_PATH/* ; do
-    PLUGIN_NAME=$(echo "$PLUGIN" | sed -e "s/$(escape "$CLI_PLUGINS_PATH")\///")
-    PLUGIN_DESCRIPTION="Missing description"
-    PLUGIN_AUTHORS="Unknow"
-    PLUGIN_VERSION="unknow"
-    PLUGIN_HIDE="0"
+    if [ -d "$PLUGIN" ] ; then
+      PLUGIN_NAME=$(echo "$PLUGIN" | sed -e "s/$(escape "$CLI_PLUGINS_PATH")\///")
+      PLUGIN_DESCRIPTION="Missing description"
+      PLUGIN_AUTHORS="Unknow"
+      PLUGIN_VERSION="unknow"
+      PLUGIN_HIDE="0"
 
-    if [ -f "$PLUGIN/init.sh" ] ; then
-      . "$PLUGIN/init.sh"
-    fi
+      if [ -f "$PLUGIN/init.sh" ] ; then
+        . "$PLUGIN/init.sh"
+      fi
 
-    if [ "$PLUGIN_HIDE" = "0" ] ; then
-      SIZE=$(printf "%s" "$PLUGIN_NAME" | wc -c)
-      eval PLUGIN_SIZE_${PLUGINS_INDEX}=\$SIZE
-      [ "$MAX_SIZE" -lt "$SIZE" ] && MAX_SIZE=$SIZE
+      if [ "$PLUGIN_HIDE" = "0" ] ; then
+        SIZE=$(printf "%s" "$PLUGIN_NAME" | wc -c)
+        eval PLUGIN_SIZE_${PLUGINS_INDEX}=\$SIZE
+        [ "$MAX_SIZE" -lt "$SIZE" ] && MAX_SIZE=$SIZE
 
-      for T in NAME DESCRIPTION AUTHORS ; do
-        eval PLUGIN_${T}_${PLUGINS_INDEX}=\$PLUGIN_${T}
-        eval PLUGIN_${T}_${PLUGINS_INDEX}=\$PLUGIN_${T}
-        eval PLUGIN_${T}_${PLUGINS_INDEX}=\$PLUGIN_${T}
-      done
+        for T in NAME DESCRIPTION AUTHORS ; do
+          eval PLUGIN_${T}_${PLUGINS_INDEX}=\$PLUGIN_${T}
+          eval PLUGIN_${T}_${PLUGINS_INDEX}=\$PLUGIN_${T}
+          eval PLUGIN_${T}_${PLUGINS_INDEX}=\$PLUGIN_${T}
+        done
 
-      PLUGINS_INDEX=$((PLUGINS_INDEX + 1))
+        PLUGINS_INDEX=$((PLUGINS_INDEX + 1))
+      fi
     fi
   done
 
@@ -44,11 +46,6 @@ list_plugins() {
 }
 
 create_plugin() {
-  NEW_PLUGIN_NAME="$1"
-  [ -n "$NEW_PLUGIN_NAME" ] || __help --plugin "$PLUGIN_NAME" --exit 1 --msg "Missing plugin name"
-  NEW_PLUGIN_PATH="$CLI_PLUGINS_PATH/$NEW_PLUGIN_NAME"
-  shift
-
   NEW_PLUGIN_VERSION="0.0.1"
   while [ "$1" ] ; do
     case "$1" in
@@ -99,8 +96,24 @@ create_plugin() {
           esac
         done 
         ;;
+      "--help" | "-h")
+        __help --plugin "$PLUGIN_NAME" --exit 0
+        shift ;;
+      "--")
+        shift ;;
+      -*)
+        __help --plugin "$PLUGIN_NAME" --exit 1 --msg "$1: Invalid option"
+        shift ;;
+      *)
+        NEW_PLUGIN_NAME="$1"
+        NEW_PLUGIN_PATH="$CLI_PLUGINS_PATH/$NEW_PLUGIN_NAME"
+        shift ;;
     esac
   done
+
+  if [ "z$NEW_PLUGIN_NAME" = "z" ] ; then
+    __help --plugin "$PLUGIN_NAME" --exit 1 --msg "Plugin name missing!"
+  fi
 
   if [ -d "$NEW_PLUGIN_PATH" ] && [ "z$FORCE" = "z" ] ; then
     echo "Plugin $NEW_PLUGIN_NAME already exist. Use --force" >&2

@@ -1,10 +1,5 @@
 #!/bin/sh
 
-NEW_CLI_NAME="$1"
-[ -n "$NEW_CLI_NAME" ] || __help --plugin "$PLUGIN_NAME" --exit 1
-NEW_CLI_PATH="$PWD/$NEW_CLI_NAME"
-shift 
-
 IMPORT_INDEX=0
 while [ "$1" ] ; do
   case "$1" in
@@ -48,11 +43,21 @@ while [ "$1" ] ; do
         esac
       done
       ;;
-    *)
-      __help --plugin "$PLUGIN_NAME" --exit 1
+    "--")
       shift ;;
+    -*)
+      __help --plugin "$PLUGIN_NAME" --exit 1 --msg "$1: Invalid option"
+      shift ;;
+    *)
+      NEW_CLI_NAME="$1"
+      [ "z$NEW_CLI_PATH" = "z" ] && NEW_CLI_PATH="$PWD/$NEW_CLI_NAME"
+      shift;;
   esac
 done
+
+if [ "z$NEW_CLI_NAME" = "z" ] ; then
+  __help --plugin "$PLUGIN_NAME" --exit 1 --msg "CLI name missing!"
+fi
 
 echo "Create new cli $NEW_CLI_NAME at $NEW_CLI_PATH"
 
@@ -68,6 +73,7 @@ cat "$CLI_ROOT_PATH/$CLI_MAIN_COMMAND" | \
   sed \
   -e "s/CLI_REPO=.*$/CLI_REPO=\"$(escape "$NEW_CLI_REPO")\"/" \
   -e "s/CLI_VERSION=.*$/CLI_VERSION=\"$(escape "$NEW_CLI_VERSION")\"/" > "$NEW_CLI_PATH/$NEW_CLI_NAME"
+chmod +x "$NEW_CLI_PATH/$NEW_CLI_NAME"
 echo " * Create plugin directory $NEW_CLI_PATH/plugins/$NEW_CLI_NAME"
 mkdir -p "$NEW_CLI_PATH/plugins/$NEW_CLI_NAME"
 
