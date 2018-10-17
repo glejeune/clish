@@ -3,8 +3,11 @@
 IMPORT_INDEX=0
 while [ "$1" ] ; do
   case "$1" in
-    "--force" | "-f" )
-      FORCE=1 ;
+    "--yes" | "-y" )
+      YES=1 ;
+      shift ;;
+    "--update" | "-u" )
+      UPDATE=1 ;
       shift ;;
     "--path" | "-p" )
       shift ;
@@ -59,36 +62,10 @@ if [ "z$NEW_CLI_NAME" = "z" ] ; then
   __help --plugin "$PLUGIN_NAME" --exit 1 --msg "CLI name missing!"
 fi
 
-echo "Create new cli $NEW_CLI_NAME at $NEW_CLI_PATH"
+[ ! -d "$NEW_CLI_PATH" ] && [ "z$UPDATE" = "z" ] && UPDATE=0
 
-if [ -d "$NEW_CLI_PATH" ] && [ "z$FORCE" = "z" ] ; then
-  echo "Directory $NEW_CLI_PATH already exists! Use --force" >&2
-  exit 1
+if [ "$UPDATE" = "1" ] ; then
+  update
+else
+  create
 fi
-
-echo " * Create root directory $NEW_CLI_PATH"
-mkdir -p "$NEW_CLI_PATH"
-echo " * Create $NEW_CLI_PATH/$NEW_CLI_NAME"
-cat "$CLI_ROOT_PATH/$CLI_MAIN_COMMAND" | \
-  sed \
-  -e "s/CLI_REPO=.*$/CLI_REPO=\"$(escape "$NEW_CLI_REPO")\"/" \
-  -e "s/CLI_VERSION=.*$/CLI_VERSION=\"$(escape "$NEW_CLI_VERSION")\"/" > "$NEW_CLI_PATH/$NEW_CLI_NAME"
-chmod +x "$NEW_CLI_PATH/$NEW_CLI_NAME"
-echo " * Create plugin directory $NEW_CLI_PATH/plugins/$NEW_CLI_NAME"
-mkdir -p "$NEW_CLI_PATH/plugins/$NEW_CLI_NAME"
-
-echo " * Initialize plugins list"
-touch "$NEW_CLI_PATH/plugins/$NEW_CLI_NAME/list.txt"
-
-eval IMPORT_$IMPORT_INDEX="init"
-IMPORT_INDEX=$((IMPORT_INDEX + 1))
-eval IMPORT_$IMPORT_INDEX="plugins"
-IMPORT_INDEX=$((IMPORT_INDEX + 1))
-eval IMPORT_$IMPORT_INDEX="help"
-for I in $(seq 0 $IMPORT_INDEX) ; do
-  P=$(eval echo \$IMPORT_"$I")
-  if [ ! -d "$NEW_CLI_PATH/plugins/$NEW_CLI_NAME/$P" ] || [ "z$FORCE" = "z1" ]  ; then
-    echo " * import plugin $P"
-    cp -r "$CLI_ROOT_PATH/plugins/$CLI_MAIN_COMMAND/$P" "$NEW_CLI_PATH/plugins/$NEW_CLI_NAME/"
-  fi
-done

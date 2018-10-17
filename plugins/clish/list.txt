@@ -1,7 +1,0 @@
-PLUGINS="$PLUGINS new"
-PLUGINS_new_name="new"
-PLUGINS_new_fetch="git"
-PLUGINS_new_repo="https://github.com/glejeune/clish-new.git"
-PLUGINS_new_commit="master"
-PLUGINS_new_description="Create a new CLI project"
-PLUGINS_new_homepage="https://github.com/glejeune/clish-new.git"

@@ -6,7 +6,8 @@ This plugin allow you to create a new CLI :
   ${CLI_MAIN_COMMAND} new <name> [options]
 
 Options: 
-  --force   -f                       : Force CLI creation even if the destination directory exists
+  --update  -u                       : Update and existing CLI
+  --yes     -y                       : When update, always answer yes
   --path    -p <path>                : Destination directory
   --repo    -r <repository url>      : Main repository URL
   --version -v <version>             : CLI version

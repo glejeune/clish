@@ -16,6 +16,14 @@ __help() {
   help "$@"
 }
 
+check_help() {
+  for _P in "$@" ; do
+    if [ "$_P" = "-h" ] || [ "$_P" = "--help" ] ; then
+      __help --plugin "$PLUGIN_NAME" --exit 0
+    fi
+  done
+}
+
 command() {
   PHASE=$1
 
