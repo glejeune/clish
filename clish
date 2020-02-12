@@ -1,6 +1,7 @@
 #!/bin/sh
 
 CLI_REPO="https://github.com/glejeune/clish.git"
+CLI_STABLE_BRANCH="master"
 CLI_VERSION="0.0.1"
 
 escape() {
@@ -16,13 +17,21 @@ __help() {
   help "$@"
 }
 
+check_help() {
+  for _P in "$@" ; do
+    if [ "$_P" = "-h" ] || [ "$_P" = "--help" ] ; then
+      __help --plugin "$PLUGIN_NAME" --exit 0
+    fi
+  done
+}
+
 command() {
   PHASE=$1
 
   if [ "$PHASE" = "init" ] ; then
-    shift 
+    shift
     PLUGIN_NAME="$1"
-    [ "z" = "z$PLUGIN_NAME" ] && __help --exit 0 
+    [ "z" = "z$PLUGIN_NAME" ] && __help --exit 0
     PLUGIN_ROOT_PATH="$CLI_PLUGINS_PATH/$PLUGIN_NAME"
     [ -d "$PLUGIN_ROOT_PATH" ] || [ "$1" = "plugins" ] || __help --msg "command $1 not found" --exit 1
   fi
