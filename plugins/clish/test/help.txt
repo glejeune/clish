@@ -1,0 +1,4 @@
+${PLUGIN_NAME} version ${PLUGIN_VERSION} by ${PLUGIN_AUTHORS}
+${PLUGIN_DESCRIPTION}.
+
+This plugin is a test plugin

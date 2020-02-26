@@ -44,6 +44,10 @@ command() {
 CLI_ROOT_PATH=$(expand "$(dirname "$0")")
 CLI_MAIN_COMMAND="$(basename "$0")"
 CLI_PLUGINS_PATH="$CLI_ROOT_PATH/plugins/$CLI_MAIN_COMMAND"
+
+[ -f "$CLI_ROOT_PATH/default_config.sh" ] && . "$CLI_ROOT_PATH/default_config.sh"
+[ -f "$HOME/.config/$CLI_MAIN_COMMAND/config" ] && . "$HOME/.config/$CLI_MAIN_COMMAND/config"
+
 case "$1" in
   *)
     [ -n "$1" ] && PLUGIN_TO_LOAD=$1 && shift

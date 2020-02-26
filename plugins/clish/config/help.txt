@@ -1,0 +1,8 @@
+${PLUGIN_NAME} version ${PLUGIN_VERSION} by ${PLUGIN_AUTHORS}
+${PLUGIN_DESCRIPTION}.
+
+Availables subcommands:
+
+get <option>          : Get value for the given option
+set <option> <value>  : Set option value
+list                  : List all options
